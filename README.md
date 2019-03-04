@@ -9,6 +9,7 @@ INSTALL:
 },
 
 - [ Go to vrp_basic_menu server.lua and change the function ch_jail with this! ]
+
  local ch_jail = {function(player,choice) 
   vRPclient.getNearestPlayers(player,{15},function(nplayers) 
 	local user_list = ""
@@ -28,8 +29,7 @@ INSTALL:
 		        if tonumber(jail_time) < 1 then
 		          jail_time = 1
 		        end
-		  
-                vRPclient.isHandcuffed(target,{}, function(handcuffed)  
+               	 vRPclient.isHandcuffed(target,{}, function(handcuffed)  
                   if handcuffed then 
 					BMclient.loadFreeze(target,{false,true,true})
 					SetTimeout(15000,function()
