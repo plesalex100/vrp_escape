@@ -1,0 +1,65 @@
+# vrp_escape
+Evadare din puscarie / Escape From Prison!
+
+INSTALL:
+- [ Create new Groups in vrp/cfg/groups.lua ]
+["jailer"] = {
+},
+["jaile2"] = {
+},
+
+- [ Go to vrp_basic_menu server.lua and change the function ch_jail with this! ]
+ local ch_jail = {function(player,choice) 
+  vRPclient.getNearestPlayers(player,{15},function(nplayers) 
+	local user_list = ""
+    for k,v in pairs(nplayers) do
+	  user_list = user_list .. "[" .. vRP.getUserId({k}) .. "]" .. GetPlayerName(k) .. " | "
+    end 
+	if user_list ~= "" then
+	  vRP.prompt({player,"Players Nearby:" .. user_list,"",function(player,target_id) 
+	    if target_id ~= nil and target_id ~= "" then 
+	      vRP.prompt({player,"Jail Time in minutes:","1",function(player,jail_time)
+			if jail_time ~= nil and jail_time ~= "" then 
+	          local target = vRP.getUserSource({tonumber(target_id)})
+			  if target ~= nil then
+		        if tonumber(jail_time) > 60 then
+  			      jail_time = 60
+		        end
+		        if tonumber(jail_time) < 1 then
+		          jail_time = 1
+		        end
+		  
+                vRPclient.isHandcuffed(target,{}, function(handcuffed)  
+                  if handcuffed then 
+					BMclient.loadFreeze(target,{false,true,true})
+					SetTimeout(15000,function()
+					  BMclient.loadFreeze(target,{false,false,false})
+					end)
+				    vRPclient.teleport(target,{1641.5477294922,2570.4819335938,45.564788818359}) -- teleport to inside jail
+				    vRPclient.notify(target,{"~r~You have been sent to jail."})
+				    vRPclient.notify(player,{"~b~You sent a player to jail."})
+				    vRP.setHunger({tonumber(target_id),0})
+				    vRP.setThirst({tonumber(target_id),0})
+				    jail_clock(tonumber(target_id),tonumber(jail_time))
+					local user_id = vRP.getUserId({player})
+					vRPbm.logInfoToFile("jailLog.txt",user_id .. " jailed "..target_id.." for " .. jail_time .. " minutes")
+			      else
+				    vRPclient.notify(player,{"~r~That player is not handcuffed."})
+			      end
+			    end)
+			  else
+				vRPclient.notify(player,{"~r~That ID seems invalid."})
+			  end
+			else
+			  vRPclient.notify(player,{"~r~The jail time can't be empty."})
+			end
+	      end})
+        else
+          vRPclient.notify(player,{"~r~No player ID selected."})
+        end 
+	  end})
+    else
+      vRPclient.notify(player,{"~r~No player nearby."})
+    end 
+  end)
+end,"Send a nearby player to jail."}
