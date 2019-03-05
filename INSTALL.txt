@@ -37,6 +37,10 @@ INSTALL:
 				    vRPclient.notify(player,{"~b~You sent a player to jail."})
 				    vRP.setHunger({tonumber(target_id),0})
 				    vRP.setThirst({tonumber(target_id),0})
+				    
+				    vRP.addUserGroup({user_id, "jailer"})
+				    vRP.addUserGroup({user_id, "jaile2"})
+				
 				    jail_clock(tonumber(target_id),tonumber(jail_time))
 					local user_id = vRP.getUserId({player})
 					vRPbm.logInfoToFile("jailLog.txt",user_id .. " jailed "..target_id.." for " .. jail_time .. " minutes")
